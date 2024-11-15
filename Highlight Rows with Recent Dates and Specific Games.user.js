@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Highlight Rows with Recent Dates and Specific Games
 // @namespace    http://tampermonkey.net/
-// @version      1.67
+// @version      1.81
 // @description  Highlight rows based on recent dates or specific game names on steam.tools/cards, even after sorting or data changes
 // @match        https://steam.tools/cards/
 // @grant        none
@@ -300,6 +300,20 @@
         "Grim Dawn",
         "Sheltered",
         "Turbo Pug DX",
+        "Escape: VR",
+        "The Albatross",
+        "Starship Annihilator",
+        "Abduction Bit",
+        "The Albatross",
+        "Starship Annihilator",
+        "Escape: VR",
+        "古剑奇谭二(GuJian2)",
+        "Party Hard 2",
+        "Nihilist Simulator",
+        "The Red Solstice",
+        "Mr Shifty",
+        "Headsnatchers",
+        "Shadowgate: MacVenture Series",
 
     ];
 
