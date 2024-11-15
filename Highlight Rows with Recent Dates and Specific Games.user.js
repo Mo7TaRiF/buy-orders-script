@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Highlight Rows with Recent Dates and Specific Games
 // @namespace    http://tampermonkey.net/
-// @version      1.62
+// @version      1.6600000000000001
 // @description  Highlight rows based on recent dates or specific game names on steam.tools/cards, even after sorting or data changes
 // @match        https://steam.tools/cards/
 // @grant        none
@@ -296,6 +296,10 @@
         "Thorne - Death Merchants",
         "The Incredible Adventures of Van Helsing III",
         "Zombie Wars: Invasion",
+        "Space Colony",
+        "Grim Dawn",
+        "Sheltered",
+        "Turbo Pug DX",
 
     ];
 
