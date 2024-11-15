@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Highlight Rows with Recent Dates and Specific Games
 // @namespace    http://tampermonkey.net/
-// @version      1.81
+// @version      1.93
 // @description  Highlight rows based on recent dates or specific game names on steam.tools/cards, even after sorting or data changes
 // @match        https://steam.tools/cards/
 // @grant        none
@@ -314,6 +314,12 @@
         "Mr Shifty",
         "Headsnatchers",
         "Shadowgate: MacVenture Series",
+        "Borderlands 2",
+        "PulseCharge",
+        "Choppa",
+        "Alchemy Garden",
+        "Age of Wonders: Planetfall",
+        "Warstone TD",
 
     ];
 
