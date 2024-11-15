@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Highlight Rows with Recent Dates and Specific Games
 // @namespace    http://tampermonkey.net/
-// @version      1.6
+// @version      1.62
 // @description  Highlight rows based on recent dates or specific game names on steam.tools/cards, even after sorting or data changes
 // @match        https://steam.tools/cards/
 // @grant        none
