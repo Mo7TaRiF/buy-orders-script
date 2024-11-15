@@ -286,6 +286,16 @@
         "Super Mustache",
         "Dungeon of the ENDLESS™",
         "Total War: WARHAMMER",
+        "MapleStory",
+        "Salt and Sanctuary",
+        "Space Pilgrim Episode III: Delta Pavonis",
+        "Zombillie",
+        "FINAL TAKE",
+        "Dark Shadows - Army of Evil",
+        "Castle Crashers",
+        "Thorne - Death Merchants",
+        "The Incredible Adventures of Van Helsing III",
+        "Zombie Wars: Invasion",
 
     ];
 
