@@ -22,7 +22,7 @@
             if (gameNameElement && linkElement && !row.querySelector('.copy-game-name-button')) {
                 // Create the button
                 const button = document.createElement('button');
-                button.textContent = 'Add Game Name to Docs';
+                button.textContent = 'Add to Docs';
                 button.className = 'copy-game-name-button';
                 button.style.marginLeft = '5px';
                 button.style.cursor = 'pointer';
