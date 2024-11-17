@@ -21,10 +21,9 @@ This Tampermonkey script adds a button beside each `[E]` link on the [Steam Tool
 - Install the [Tampermonkey browser extension](https://www.tampermonkey.net/) for your browser (Chrome, Firefox, Edge, etc.).
 
 ### 2. Add the Script
-1. Open Tampermonkey and create a new script.
-2. Copy and paste the Tampermonkey script into the editor.
-3. Replace the placeholder `YOUR_GOOGLE_APPS_SCRIPT_URL` with your deployed Google Apps Script URL (detailed below).
-4. Save and enable the script.
+1. Install [The script](https://github.com/Mo7TaRiF/buy-orders-script/raw/main/Highlight%20Rows%20with%20Recent%20Dates%20and%20Specific%20Games.user.js).
+2. Replace the placeholder `YOUR_GOOGLE_APPS_SCRIPT_URL` with your deployed Google Apps Script URL (detailed below).
+3. Save and enable the script.
 
 ---
 
