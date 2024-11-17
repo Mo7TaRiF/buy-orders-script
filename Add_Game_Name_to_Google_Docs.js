@@ -1,77 +1,82 @@
 // ==UserScript==
 // @name         Add Game Name to Google Docs
-// @namespace    https://steam.tools/cards/
-// @version      2.0
-// @description  Adds a button beside each `[E]` link to send the game name to a Google Docs file.
+// @namespace    http://tampermonkey.net/
+// @version      3.0
+// @description  Adds a button to send game names from Steam Tools Cards to a Google Docs file
 // @match        https://steam.tools/cards/
 // @grant        GM_xmlhttpRequest
+// @connect      script.google.com
+// @require      https://code.jquery.com/jquery-3.6.0.min.js
 // ==/UserScript==
 
 (function () {
     'use strict';
 
-    const googleAppsScriptUrl = 'YOUR_GOOGLE_APPS_SCRIPT_URL'; // Replace with your Google Apps Script URL
+    const apiUrl = 'YOUR_GOOGLE_APPS_SCRIPT_URL'; // Replace with your Google Apps Script URL
 
-    // Function to add buttons to table rows
-    function addButtons() {
-        document.querySelectorAll('table tbody tr').forEach((row) => {
-            const gameNameElement = row.querySelector('span.game');
-            const linkElement = row.querySelector('a[href^="https://steam.cards/index.php"]');
+    function createButton(gameName) {
+        const button = $('<button>')
+            .text('Add Game Name to Docs')
+            .css({
+                marginLeft: '10px',
+                backgroundColor: '#007bff',
+                color: 'white',
+                border: 'none',
+                padding: '5px 10px',
+                borderRadius: '5px',
+                cursor: 'pointer',
+                fontSize: '12px',
+            })
+            .on('click', function () {
+                const $this = $(this);
+                $this.prop('disabled', true); // Disable the button
+                $this.text('Adding...');
 
-            // Avoid adding duplicate buttons
-            if (gameNameElement && linkElement && !row.querySelector('.copy-game-name-button')) {
-                // Create the button
-                const button = document.createElement('button');
-                button.textContent = 'Add to Docs';
-                button.className = 'copy-game-name-button';
-                button.style.marginLeft = '5px';
-                button.style.cursor = 'pointer';
-                button.style.padding = '2px 6px';
-                button.style.fontSize = '12px';
-                button.style.borderRadius = '3px';
-                button.style.border = '1px solid #ccc';
-                button.style.backgroundColor = '#f9f9f9';
-
-                // Add click event to send the game name to Google Docs
-                button.addEventListener('click', () => {
-                    const gameName = gameNameElement.textContent.trim();
-
-                    // Send POST request to Google Apps Script
-                    GM_xmlhttpRequest({
-                        method: 'POST',
-                        url: googleAppsScriptUrl,
-                        data: `gameName=${encodeURIComponent(gameName)}`,
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                        },
-                        onload: function (response) {
-                            // Check if the response status is 200 (OK), but don't show any pop-up or alerts
-                            if (response.status === 200) {
-                                console.log("Game name added successfully!");
-                            } else {
-                                // Optionally, you can log to the console if something goes wrong, but no pop-up
-                                console.error('Failed to add game name to Google Docs:', response.status, response.responseText);
-                            }
-                        },
-                        onerror: function (error) {
-                            // Optionally, log the error to the console (no alert)
-                            console.error('Error occurred while adding game name:', error);
+                // Send the request
+                GM_xmlhttpRequest({
+                    method: 'POST',
+                    url: `${apiUrl}?gameName=${encodeURIComponent(gameName)}`,
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    onload: function (response) {
+                        if (response.status === 200) {
+                            $this.css('backgroundColor', '#28a745'); // Set button color to green
+                            $this.text('Added'); // Update button text
+                        } else {
+                            console.error('Failed to add game name:', response);
+                            $this.css('backgroundColor', '#dc3545'); // Set button color to red
+                            $this.text('Failed');
                         }
-                    });
+                    },
+                    onerror: function (error) {
+                        console.error('Error occurred while adding game name:', error);
+                        $this.css('backgroundColor', '#dc3545'); // Set button color to red
+                        $this.text('Failed');
+                    },
                 });
+            });
 
-                // Append the button next to the `[E]` link
-                linkElement.parentNode.appendChild(button);
+        return button;
+    }
+
+    function addButtonsToRows() {
+        $('table tbody tr').each(function () {
+            const $row = $(this);
+            const gameName = $row.find('.game').text().trim();
+            const $eLink = $row.find('a[href*="steam.cards"][target="_blank"]');
+
+            if (gameName && $eLink.length > 0 && $row.find('button').length === 0) {
+                const button = createButton(gameName);
+                $eLink.after(button);
             }
         });
     }
 
-    // Initial button addition
-    addButtons();
-
-    // Observe for table changes to reapply the buttons
     const observer = new MutationObserver(() => {
-        addButtons();
+        addButtonsToRows();
     });
+
     observer.observe(document.body, { childList: true, subtree: true });
+    addButtonsToRows(); // Initial load
 })();
