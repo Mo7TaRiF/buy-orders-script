@@ -7,6 +7,8 @@
 // @grant        GM_xmlhttpRequest
 // @connect      script.google.com
 // @require      https://code.jquery.com/jquery-3.6.0.min.js
+// @connect      script.google.com
+// @connect      script.googleusercontent.com
 // ==/UserScript==
 
 (function () {
