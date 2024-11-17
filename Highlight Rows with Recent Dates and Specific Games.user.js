@@ -1,76 +1,77 @@
 // ==UserScript==
-// @name         Highlight Rows with Date Range and Specific Games
-// @namespace    http://tampermonkey.net/
-// @version      1.96
-// @description  Highlight rows based on a date range or specific game names on steam.tools/cards, even after sorting or data changes
+// @name         Add Game Name to Google Docs
+// @namespace    https://steam.tools/cards/
+// @version      2.0
+// @description  Adds a button beside each `[E]` link to send the game name to a Google Docs file.
 // @match        https://steam.tools/cards/
-// @grant        none
+// @grant        GM_xmlhttpRequest
 // ==/UserScript==
 
-(function() {
+(function () {
     'use strict';
 
-    const startDate = new Date('2024-10-23');
-    const endDate = new Date('2023-05-15');
-    let gameNames = [];
+    const googleAppsScriptUrl = 'YOUR_GOOGLE_APPS_SCRIPT_URL'; // Replace with your Google Apps Script URL
 
-    const style = document.createElement('style');
-    style.textContent = `
-        .highlight-date { background-color: #ffeb3b !important; }
-        .highlight-game { background-color: #87cefa !important; }
-        .highlight-both { background: linear-gradient(90deg, #ffeb3b 50%, #87cefa 50%) !important; }
-    `;
-    document.head.appendChild(style);
+    // Function to add buttons to table rows
+    function addButtons() {
+        document.querySelectorAll('table tbody tr').forEach((row) => {
+            const gameNameElement = row.querySelector('span.game');
+            const linkElement = row.querySelector('a[href^="https://steam.cards/index.php"]');
 
-    function parseDate(dateStr) {
-        dateStr = dateStr.replace(/(\d+)(st|nd|rd|th)/, '$1');
-        return new Date(dateStr);
-    }
+            // Avoid adding duplicate buttons
+            if (gameNameElement && linkElement && !row.querySelector('.copy-game-name-button')) {
+                // Create the button
+                const button = document.createElement('button');
+                button.textContent = 'Add Game Name to Docs';
+                button.className = 'copy-game-name-button';
+                button.style.marginLeft = '5px';
+                button.style.cursor = 'pointer';
+                button.style.padding = '2px 6px';
+                button.style.fontSize = '12px';
+                button.style.borderRadius = '3px';
+                button.style.border = '1px solid #ccc';
+                button.style.backgroundColor = '#f9f9f9';
 
-    function isDateInRange(date) {
-        return date >= endDate && date <= startDate;
-    }
+                // Add click event to send the game name to Google Docs
+                button.addEventListener('click', () => {
+                    const gameName = gameNameElement.textContent.trim();
 
-    function highlightRows() {
-        document.querySelectorAll('table tbody tr').forEach(row => {
-            const cells = row.querySelectorAll('td');
-            if (cells.length > 0) {
-                const firstCell = cells[0].textContent.trim();
-                const lastCell = cells[cells.length - 1];
-                const cellDate = parseDate(lastCell.textContent.trim());
+                    // Send POST request to Google Apps Script
+                    GM_xmlhttpRequest({
+                        method: 'POST',
+                        url: googleAppsScriptUrl,
+                        data: `gameName=${encodeURIComponent(gameName)}`,
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        onload: function (response) {
+                            // Check if the response status is 200 (OK), but don't show any pop-up or alerts
+                            if (response.status === 200) {
+                                console.log("Game name added successfully!");
+                            } else {
+                                // Optionally, you can log to the console if something goes wrong, but no pop-up
+                                console.error('Failed to add game name to Google Docs:', response.status, response.responseText);
+                            }
+                        },
+                        onerror: function (error) {
+                            // Optionally, log the error to the console (no alert)
+                            console.error('Error occurred while adding game name:', error);
+                        }
+                    });
+                });
 
-                const isInRange = isDateInRange(cellDate);
-                const isSpecificGame = gameNames.includes(firstCell);
-
-                row.classList.remove('highlight-date', 'highlight-game', 'highlight-both');
-                if (isInRange && isSpecificGame) {
-                    row.classList.add('highlight-both');
-                } else if (isInRange) {
-                    row.classList.add('highlight-date');
-                } else if (isSpecificGame) {
-                    row.classList.add('highlight-game');
-                }
+                // Append the button next to the `[E]` link
+                linkElement.parentNode.appendChild(button);
             }
         });
     }
 
-    async function fetchGameNames() {
-        const docId = '1FAPMOu0dGSAWO9Y8oZ06oSN0oWnvFtpBeFci-yLbAdo';
-        const url = `https://docs.google.com/document/d/${docId}/export?format=txt`;
+    // Initial button addition
+    addButtons();
 
-        try {
-            const response = await fetch(url);
-            if (!response.ok) throw new Error('Failed to fetch game names');
-            const text = await response.text();
-            gameNames = text.split('\n').map(name => name.trim()).filter(name => name);
-            highlightRows(); // Re-run after fetching the names
-        } catch (error) {
-            console.error('Error fetching game names:', error);
-        }
-    }
-
-    fetchGameNames();
-
-    const observer = new MutationObserver(highlightRows);
+    // Observe for table changes to reapply the buttons
+    const observer = new MutationObserver(() => {
+        addButtons();
+    });
     observer.observe(document.body, { childList: true, subtree: true });
 })();
