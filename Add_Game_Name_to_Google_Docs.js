@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Add Game Name to Google Docs
 // @namespace    http://tampermonkey.net/
-// @version      3.0
-// @description  Adds a button to send game names from Steam Tools Cards to a Google Docs file
+// @version      1.4
+// @description  Adds a button to send game names from Steam Tools Cards to a Google Docs file, skipping highlighted rows
 // @match        https://steam.tools/cards/
 // @grant        GM_xmlhttpRequest
 // @connect      script.google.com
@@ -32,7 +32,6 @@
                 $this.prop('disabled', true); // Disable the button
                 $this.text('Adding...');
 
-                // Send the request
                 GM_xmlhttpRequest({
                     method: 'POST',
                     url: `${apiUrl}?gameName=${encodeURIComponent(gameName)}`,
@@ -41,17 +40,17 @@
                     },
                     onload: function (response) {
                         if (response.status === 200) {
-                            $this.css('backgroundColor', '#28a745'); // Set button color to green
-                            $this.text('Added'); // Update button text
+                            $this.css('backgroundColor', '#28a745'); // Green for success
+                            $this.text('Added');
                         } else {
                             console.error('Failed to add game name:', response);
-                            $this.css('backgroundColor', '#dc3545'); // Set button color to red
+                            $this.css('backgroundColor', '#dc3545'); // Red for failure
                             $this.text('Failed');
                         }
                     },
                     onerror: function (error) {
                         console.error('Error occurred while adding game name:', error);
-                        $this.css('backgroundColor', '#dc3545'); // Set button color to red
+                        $this.css('backgroundColor', '#dc3545'); // Red for failure
                         $this.text('Failed');
                     },
                 });
@@ -66,17 +65,32 @@
             const gameName = $row.find('.game').text().trim();
             const $eLink = $row.find('a[href*="steam.cards"][target="_blank"]');
 
-            if (gameName && $eLink.length > 0 && $row.find('button').length === 0) {
+            // Skip rows with highlight classes or if the button already exists
+            if (
+                gameName &&
+                $eLink.length > 0 &&
+                $row.find('button').length === 0 &&
+                !$row.hasClass('highlight-date') &&
+                !$row.hasClass('highlight-game') &&
+                !$row.hasClass('highlight-both')
+            ) {
                 const button = createButton(gameName);
                 $eLink.after(button);
             }
         });
     }
 
+    function delayedButtonAdd() {
+        // Introduce a delay to wait for the highlight script to finish processing
+        setTimeout(() => {
+            addButtonsToRows();
+        }, 5000); // Adjust delay if needed
+    }
+
     const observer = new MutationObserver(() => {
-        addButtonsToRows();
+        delayedButtonAdd();
     });
 
     observer.observe(document.body, { childList: true, subtree: true });
-    addButtonsToRows(); // Initial load
+    delayedButtonAdd(); // Initial load
 })();
