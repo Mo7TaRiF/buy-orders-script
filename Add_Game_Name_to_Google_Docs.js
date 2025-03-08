@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Add Game Name to Google Docs
 // @namespace    http://tampermonkey.net/
-// @version      1.4
+// @version      1.5
 // @description  Adds a button to send game names from Steam Tools Cards to a Google Docs file, skipping highlighted rows
 // @match        https://steam.tools/cards/
 // @grant        GM_xmlhttpRequest
@@ -14,14 +14,14 @@
 (function () {
     'use strict';
 
-    const apiUrl = 'YOUR_GOOGLE_APPS_SCRIPT_URL'; // Replace with your Google Apps Script URL
+    const apiUrl = 'https://script.google.com/macros/s/AKfycby1l6qy0eWpYkfOzNePabg9IO4Sf_AYZo2MxxbogRbTci0r4pgDj-iHmNcNwDEUZ2Sxqg/exec'; // Replace with your Google Apps Script URL
 
-    function createButton(gameName) {
+    function createButton(gameName, buttonText, docId, buttonColor) {
         const button = $('<button>')
-            .text('Add Game Name to Docs')
+            .text(buttonText)
             .css({
                 marginLeft: '10px',
-                backgroundColor: '#007bff',
+                backgroundColor: buttonColor,
                 color: 'white',
                 border: 'none',
                 padding: '5px 10px',
@@ -34,24 +34,35 @@
                 $this.prop('disabled', true); // Disable the button
                 $this.text('Adding...');
 
+                // Prepare the data to send
+                const data = JSON.stringify({
+                    gameName: gameName,
+                    docId: docId,
+                });
+
+                console.log(`Sending data: ${data}`); // Debugging: Log the data being sent
+
+                // Send the request
                 GM_xmlhttpRequest({
                     method: 'POST',
-                    url: `${apiUrl}?gameName=${encodeURIComponent(gameName)}`,
+                    url: apiUrl,
+                    data: data,
                     headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Content-Type': 'application/json', // Send data as JSON
                     },
                     onload: function (response) {
                         if (response.status === 200) {
+                            console.log(`Game "${gameName}" added successfully to ${buttonText}.`);
                             $this.css('backgroundColor', '#28a745'); // Green for success
                             $this.text('Added');
                         } else {
-                            console.error('Failed to add game name:', response);
+                            console.warn(`Game "${gameName}" may not have been added. Response:`, response);
                             $this.css('backgroundColor', '#dc3545'); // Red for failure
                             $this.text('Failed');
                         }
                     },
                     onerror: function (error) {
-                        console.error('Error occurred while adding game name:', error);
+                        console.error(`Error occurred while adding "${gameName}":`, error);
                         $this.css('backgroundColor', '#dc3545'); // Red for failure
                         $this.text('Failed');
                     },
@@ -76,8 +87,10 @@
                 !$row.hasClass('highlight-game') &&
                 !$row.hasClass('highlight-both')
             ) {
-                const button = createButton(gameName);
-                $eLink.after(button);
+                const toLowButton = createButton(gameName, 'To Low', '1FAPMOu0dGSAWO9Y8oZ06oSN0oWnvFtpBeFci-yLbAdo', '#007bff');
+                const toHighButton = createButton(gameName, 'To High', '1fgt2EPiLqynPiWSAsgjbR3-hJZgZpgqXKG85wdaJNZ4', '#ffc107'); // Yellow color for To High
+                $eLink.after(toLowButton);
+                $eLink.after(toHighButton);
             }
         });
     }
@@ -86,7 +99,7 @@
         // Introduce a delay to wait for the highlight script to finish processing
         setTimeout(() => {
             addButtonsToRows();
-        }, 5000); // Adjust delay if needed
+        }, 2000); // Adjust delay if needed
     }
 
     const observer = new MutationObserver(() => {
