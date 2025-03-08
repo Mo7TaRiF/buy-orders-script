@@ -41,28 +41,47 @@ Paste the following script into the editor:
 
 ```javascript
 function doPost(e) {
-    // Allow cross-origin requests
-    var headers = {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*", 
-        "Access-Control-Allow-Methods": "POST",
-        "Access-Control-Allow-Headers": "Content-Type"
-    };
+  // Log the start of the function
+  Logger.log('doPost function started');
 
-    // Extract game name from the POST request
-    var gameName = e.parameter.gameName;
+  // Check if e.postData is defined
+  if (!e.postData) {
+    Logger.log('Error: e.postData is undefined');
+    return ContentService.createTextOutput('Error: e.postData is undefined');
+  }
 
-    // Append the game name to the Google Docs file
-    var docId = 'YOUR_GOOGLE_DOC_ID'; // Replace with your Google Docs ID
+  // Parse the POST request body
+  var body = e.postData.contents; // Read the raw body
+  Logger.log(`Raw body: ${body}`); // Debugging: Log the raw body
+
+  try {
+    var params = JSON.parse(body); // Parse the JSON body
+    Logger.log(`Parsed params: ${JSON.stringify(params)}`); // Debugging: Log the parsed params
+
+    // Extract gameName and docId
+    var gameName = params.gameName;
+    var docId = params.docId;
+
+    // Debugging: Log the received data
+    Logger.log(`Received gameName: ${gameName}, docId: ${docId}`);
+
+    // Open the correct document
     var doc = DocumentApp.openById(docId);
-    var body = doc.getBody();
-    body.appendParagraph(gameName);
+    Logger.log(`Document opened successfully: ${doc.getName()}`); // Debugging: Log the document name
+
+    var docBody = doc.getBody();
+
+    // Append the game name to the document
+    docBody.appendParagraph(gameName);
+    Logger.log(`Game name appended: ${gameName}`); // Debugging: Log the appended game name
 
     // Return a success response
-    return ContentService.createTextOutput()
-        .setMimeType(ContentService.MimeType.JSON)
-        .setContent(JSON.stringify({ status: "success" }))
-        .setHeaders(headers);
+    return ContentService.createTextOutput('Game Name Added: ' + gameName);
+  } catch (error) {
+    // Log any errors
+    Logger.log(`Error: ${error.toString()}`);
+    return ContentService.createTextOutput('Error: ' + error.toString());
+  }
 }
 ```
 
