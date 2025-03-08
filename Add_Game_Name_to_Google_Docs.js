@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Add Game Name to Google Docs
 // @namespace    http://tampermonkey.net/
-// @version      1.5
-// @description  Adds a button to send game names from Steam Tools Cards to a Google Docs file, skipping highlighted rows
+// @version      1.6
+// @description  Adds buttons to send game names from Steam Tools Cards to Google Docs files, skipping highlighted rows
 // @match        https://steam.tools/cards/
 // @grant        GM_xmlhttpRequest
 // @connect      script.google.com
@@ -14,7 +14,7 @@
 (function () {
     'use strict';
 
-    const apiUrl = 'https://script.google.com/macros/s/AKfycby1l6qy0eWpYkfOzNePabg9IO4Sf_AYZo2MxxbogRbTci0r4pgDj-iHmNcNwDEUZ2Sxqg/exec'; // Replace with your Google Apps Script URL
+    const apiUrl = 'https://script.google.com/macros/s/AKfycbz5l9FE0gc5UxXzuKWZtB8YYYQW71aNkkdCVXdY_y6krBm6I6MBy0K9JkYCaO2avkfT/exec'; // Replace with your Google Apps Script URL
 
     function createButton(gameName, buttonText, docId, buttonColor) {
         const button = $('<button>')
@@ -89,6 +89,15 @@
             ) {
                 const toLowButton = createButton(gameName, 'To Low', '1FAPMOu0dGSAWO9Y8oZ06oSN0oWnvFtpBeFci-yLbAdo', '#007bff');
                 const toHighButton = createButton(gameName, 'To High', '1fgt2EPiLqynPiWSAsgjbR3-hJZgZpgqXKG85wdaJNZ4', '#ffc107'); // Yellow color for To High
+
+                // Hide buttons based on row color
+                if ($row.hasClass('highlight-low')) {
+                    toLowButton.hide(); // Hide To Low button if row is highlighted blue
+                }
+                if ($row.hasClass('highlight-high')) {
+                    toHighButton.hide(); // Hide To High button if row is highlighted yellow
+                }
+
                 $eLink.after(toLowButton);
                 $eLink.after(toHighButton);
             }
