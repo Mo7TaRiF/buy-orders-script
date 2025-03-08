@@ -14,7 +14,7 @@
 (function () {
     'use strict';
 
-    const apiUrl = 'https://script.google.com/macros/s/AKfycbz5l9FE0gc5UxXzuKWZtB8YYYQW71aNkkdCVXdY_y6krBm6I6MBy0K9JkYCaO2avkfT/exec'; // Replace with your Google Apps Script URL
+    const apiUrl = 'https://script.google.com/macros/s/AKfycby1l6qy0eWpYkfOzNePabg9IO4Sf_AYZo2MxxbogRbTci0r4pgDj-iHmNcNwDEUZ2Sxqg/exec'; // Replace with your Google Apps Script URL
 
     function createButton(gameName, buttonText, docId, buttonColor) {
         const button = $('<button>')
